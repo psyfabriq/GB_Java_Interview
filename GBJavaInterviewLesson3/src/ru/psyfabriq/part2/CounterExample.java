@@ -14,12 +14,10 @@ public class CounterExample {
 	class Increment implements Runnable {
 		public void run() {
 			long threadId = Thread.currentThread().getId();
-			for (int i = 0; i < 100; i++) {
+			for (int i = 0; i < 10; i++) {
 				counter.increment();
 				System.out.println("Thread # " + threadId + " count : " + counter.print());
-				try {
-					Thread.sleep(200);
-				} catch (InterruptedException e) {}
+
 			}
 		}
 	}
@@ -27,10 +25,7 @@ public class CounterExample {
 	class Decrement implements Runnable {
 		public void run() {
 			long threadId = Thread.currentThread().getId();
-			for (int i = 0; i < 100; i++) {
-				try {
-					Thread.sleep(500);
-				} catch (InterruptedException e) {}
+			for (int i = 0; i < 10; i++) {
 				counter.decrement();
 				System.out.println("Thread # " + threadId + " count : " + counter.print());
 			}
