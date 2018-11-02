@@ -2,8 +2,10 @@ package ru.psyfabriq.config;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.*;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -11,21 +13,19 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-import javax.sql.DataSource;
 import java.util.Properties;
+import javax.sql.DataSource;
 
 @Configuration
 @EnableTransactionManagement
-@EnableAspectJAutoProxy(proxyTargetClass = true)
-@EnableJpaRepositories("ru.psyfabriq.repository")
+@ComponentScan(basePackages = { "ru.psyfabriq.repository","ru.psyfabriq.service" })
 @PropertySource("classpath:db-conf.properties")
 public class DBConfig implements WebMvcConfigurer {
     @Bean(name = "dataSource")
-    public DataSource dataSource(@Value("${datasource.driver}") String dataSourceDriver,
-                                 @Value("${datasource.url}") String dataSourceUrl, @Value("${datasource.username}") String dataSourceUser,
-                                 @Value("${datasource.password}") String dataSourcePassword,
-                                 @Value("${datasource.schema}") String dataSourceScheme) {
+    public DataSource dataSource(@Value("${db.driver}") String dataSourceDriver,
+                                 @Value("${db.url}") String dataSourceUrl,
+                                 @Value("${db.username}") String dataSourceUser,
+                                 @Value("${db.password}") String dataSourcePassword) {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName(dataSourceDriver);
         dataSource.setUrl(dataSourceUrl);
@@ -38,19 +38,33 @@ public class DBConfig implements WebMvcConfigurer {
     public LocalContainerEntityManagerFactoryBean entityManagerFactoryBean(
             @Qualifier("dataSource") DataSource dataSource, @Value("${hibernate.max_fetch_depth}") String maxFetchDepth,
             @Value("${hibernate.jdbc.fetch_size}") String fetchSize,
-            @Value("${hibernate.jdbc.batch_size}") String batchSize,
-            @Value("${hibernate.show_sql}") String showSql,
-            @Value("${hibernate.hb2ddl.auto}") String hb2ddl
+            @Value("${hibernate.jdbc.batch_size}") String batchSize, @Value("${hibernate.show_sql}") String showSql,
+            @Value("${hibernate.hb2ddl.auto}") String hb2ddl,
+            @Value("${db.entitymanager.packages.to.scan}") String pacagesToScan
 
     ) {
+        // Создание класса фабрики, реализующей интерфейс
+        // FactoryBean<EntityManagerFactory>
         final LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
+        // Задание источника подключения
         factory.setDataSource(dataSource);
+        // Задание адаптера для конкретной реализации JPA
+        // указывает, какая именно библиотека будет использоваться в качестве поставщика
+        // постоянства
         factory.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
-        factory.setPackagesToScan("ru.psyfabriq.entity");
+        // Указание пакетов, в которых будут находиться классы-сущности
+        factory.setPackagesToScan(pacagesToScan);
+        // factory.setPersistenceUnitName("persistenceUnit");
+        // Создание свойств для настройки Hibernate
         final Properties properties = new Properties();
+        // Указание максимальной глубины связи (будет рассмотрено в следующем уроке)
         properties.put("hibernate.max_fetch_depth", maxFetchDepth);
+        // Определение максимального количества строк, возвращаемых за один запрос из БД
         properties.put("hibernate.jdbc.fetch_size", fetchSize);
+        // Определение максимального количества запросов при использовании пакетных
+        // операций
         properties.put("hibernate.jdbc.batch_size", batchSize);
+        // Включает логирование
         properties.put("hibernate.show_sql", showSql);
         properties.put("hibernate.hbm2ddl.auto", hb2ddl);
         factory.setJpaProperties(properties);
@@ -64,4 +78,6 @@ public class DBConfig implements WebMvcConfigurer {
         transactionManager.setEntityManagerFactory(entityManagerFactoryBean.getObject());
         return transactionManager;
     }
+
+
 }

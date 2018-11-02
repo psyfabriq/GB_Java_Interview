@@ -1,25 +1,40 @@
 package ru.psyfabriq.config;
 
-
-import org.springframework.context.annotation.Configuration;
+import org.springframework.web.filter.CharacterEncodingFilter;
+import org.springframework.web.filter.HiddenHttpMethodFilter;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
+import javax.servlet.Filter;
 
 public class AppInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
-
     @Override
     protected Class<?>[] getRootConfigClasses() {
-        return new Class[]{DBConfig.class};
+        //возвращает корневую конфигурации приложения (сервисы и дао-уровень)
+        return new Class<?>[]{DBConfig.class};
     }
 
     @Override
     protected Class<?>[] getServletConfigClasses() {
-        return new Class[]{WebMvcConfig.class};
+        //возвращает конфигураци сервлета(веб-уровень, который включает в себя контроллеры)
+        return new Class<?>[]{WebMvcConfig.class};
     }
 
     @Override
     protected String[] getServletMappings() {
-
+        //возвращает путь, на который мэппится данный сервлет
         return new String[]{"/"};
     }
+
+    @Override
+    protected Filter[] getServletFilters() {
+        //создание фильтра кодировки, который позволит работать с русскими символами
+        CharacterEncodingFilter characterEncodingFilter = new CharacterEncodingFilter();
+        characterEncodingFilter.setEncoding("UTF-8");
+        characterEncodingFilter.setForceEncoding(true);
+        //создание фильтра, который добавляет поддержку  HTTP методов(например,таких как PUT)
+        HiddenHttpMethodFilter httpMethodFilter = new HiddenHttpMethodFilter();
+
+        return new Filter[]{characterEncodingFilter, httpMethodFilter};
+    }
 }
+
