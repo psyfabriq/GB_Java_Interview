@@ -33,7 +33,7 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public Student getByName(String name) {
-        return studentRepository.findByName(name).get();
+        return studentRepository.findByFirstName(name).get();
     }
 
     @Override
@@ -53,7 +53,7 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public Boolean existsByName(String name) {
-        return studentRepository.existsByName(name);
+        return studentRepository.existsByFirstName(name);
     }
 
     @Override

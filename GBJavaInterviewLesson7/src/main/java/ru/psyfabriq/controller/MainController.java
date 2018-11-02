@@ -1,6 +1,5 @@
 package ru.psyfabriq.controller;
 
-import com.sun.org.apache.xerces.internal.util.SynchronizedSymbolTable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;

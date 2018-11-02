@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -20,6 +21,7 @@ import javax.sql.DataSource;
 @EnableTransactionManagement
 @ComponentScan(basePackages = { "ru.psyfabriq.repository","ru.psyfabriq.service" })
 @PropertySource("classpath:db-conf.properties")
+@EnableJpaRepositories("ru.psyfabriq.repository")
 public class DBConfig implements WebMvcConfigurer {
     @Bean(name = "dataSource")
     public DataSource dataSource(@Value("${db.driver}") String dataSourceDriver,
