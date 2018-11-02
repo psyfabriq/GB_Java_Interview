@@ -3,6 +3,7 @@ package ru.psyfabriq.config;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -17,10 +18,7 @@ import java.util.Properties;
 @Configuration
 @EnableTransactionManagement
 @EnableAspectJAutoProxy(proxyTargetClass = true)
-@ComponentScan(basePackages = {
-       "ru.psyfabriq.repository",
-       "ru.psyfabriq.service"
-})
+@EnableJpaRepositories("ru.psyfabriq.repository")
 @PropertySource("classpath:db-conf.properties")
 public class DBConfig implements WebMvcConfigurer {
     @Bean(name = "dataSource")
@@ -45,28 +43,14 @@ public class DBConfig implements WebMvcConfigurer {
             @Value("${hibernate.hb2ddl.auto}") String hb2ddl
 
     ) {
-        // Создание класса фабрики, реализующей интерфейс
-        // FactoryBean<EntityManagerFactory>
         final LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
-        // Задание источника подключения
         factory.setDataSource(dataSource);
-        // Задание адаптера для конкретной реализации JPA
-        // указывает, какая именно библиотека будет использоваться в качестве поставщика
-        // постоянства
         factory.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
-        // Указание пакетов, в которых будут находиться классы-сущности
         factory.setPackagesToScan("ru.psyfabriq.entity");
-        // factory.setPersistenceUnitName("persistenceUnit");
-        // Создание свойств для настройки Hibernate
         final Properties properties = new Properties();
-        // Указание максимальной глубины связи (будет рассмотрено в следующем уроке)
         properties.put("hibernate.max_fetch_depth", maxFetchDepth);
-        // Определение максимального количества строк, возвращаемых за один запрос из БД
         properties.put("hibernate.jdbc.fetch_size", fetchSize);
-        // Определение максимального количества запросов при использовании пакетных
-        // операций
         properties.put("hibernate.jdbc.batch_size", batchSize);
-        // Включает логирование
         properties.put("hibernate.show_sql", showSql);
         properties.put("hibernate.hbm2ddl.auto", hb2ddl);
         factory.setJpaProperties(properties);

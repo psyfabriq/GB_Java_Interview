@@ -1,5 +1,6 @@
 package ru.psyfabriq.service;
 
+
 import ru.psyfabriq.dto.StudentRequest;
 import ru.psyfabriq.dto.StudentResponse;
 import ru.psyfabriq.entity.Student;
@@ -16,3 +17,4 @@ public interface StudentService extends ExecutestService<Student,StudentRequest,
     Boolean existsByName(String name);
     Boolean existsByID(Integer id);
 }
+

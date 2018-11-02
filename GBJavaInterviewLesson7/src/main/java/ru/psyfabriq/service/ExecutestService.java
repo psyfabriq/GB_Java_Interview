@@ -13,4 +13,3 @@ public interface ExecutestService<E,D,DR>  {
 
     Page<DR> findPaginated(Pageable pageable);
 }
-
